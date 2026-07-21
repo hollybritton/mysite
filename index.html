@@ -31,38 +31,38 @@
     <main class="horizontal-scroll" id="scrollContainer">
         
         <!-- Rut & Holly -->
-        <div class="slide">
-            <img src="portfolio_projects/rut&holly/wedding_invite.png" alt="Wedding Invite" style="aspect-ratio: 1098/1500;">
+        <div class="slide" data-ratio="1098/1500">
+            <img src="portfolio_projects/rut&holly/wedding_invite.png" alt="Wedding Invite">
         </div>
-        <div class="slide">
-            <video loop muted playsinline preload="none" data-src="portfolio_projects/rut&holly/Untitled - July 13, 2026 at 12.37.45 (2).mp4" style="aspect-ratio: 1542/1080;">
+        <div class="slide" data-ratio="1542/1080">
+            <video loop muted playsinline preload="none" data-src="portfolio_projects/rut&holly/Untitled - July 13, 2026 at 12.37.45 (2).mp4">
             </video>
         </div>
-        <div class="slide">
-            <img src="portfolio_projects/rut&holly/tati.png" alt="Tati" style="aspect-ratio: 1000/1500;">
+        <div class="slide" data-ratio="1000/1500">
+            <img src="portfolio_projects/rut&holly/tati.png" alt="Tati">
         </div>
-        <div class="slide">
-            <video loop muted playsinline preload="none" data-src="portfolio_projects/rut&holly/foldout.mp4" style="aspect-ratio: 2498/2558;">
+        <div class="slide" data-ratio="2498/2558">
+            <video loop muted playsinline preload="none" data-src="portfolio_projects/rut&holly/foldout.mp4">
             </video>
         </div>
 
         <!-- Indie & Harry -->
-        <div class="slide">
-            <img src="portfolio_projects/indie&harry/invite_final.png" alt="Invite" style="aspect-ratio: 1159/1500;">
+        <div class="slide" data-ratio="1159/1500">
+            <img src="portfolio_projects/indie&harry/invite_final.png" alt="Invite">
         </div>
-        <div class="slide">
-            <img src="portfolio_projects/indie&harry/flower.png" alt="Flower" style="aspect-ratio: 1159/1500;">
+        <div class="slide" data-ratio="1159/1500">
+            <img src="portfolio_projects/indie&harry/flower.png" alt="Flower">
         </div>
-        <div class="slide">
-            <img src="portfolio_projects/indie&harry/map_2.png" alt="Map 2" style="aspect-ratio: 1159/1500;">
+        <div class="slide" data-ratio="1159/1500">
+            <img src="portfolio_projects/indie&harry/map_2.png" alt="Map 2">
         </div>
 
         <!-- Found -->
-        <div class="slide">
-            <img src="portfolio_projects/found/blue_speakers.png" alt="Blue Speakers" style="aspect-ratio: 1500/1001;">
+        <div class="slide" data-ratio="1500/1001">
+            <img src="portfolio_projects/found/blue_speakers.png" alt="Blue Speakers">
         </div>
-        <div class="slide">
-            <img src="portfolio_projects/found/logo_test1.png" alt="Found Logo Test" style="aspect-ratio: 1071/1500;">
+        <div class="slide" data-ratio="1071/1500">
+            <img src="portfolio_projects/found/logo_test1.png" alt="Found Logo Test">
         </div>
     </main>
     
@@ -75,9 +75,8 @@
             // Force explicit pixel widths on every slide to bypass Safari flexbox collapse bugs
             const h = container.clientHeight;
             originalSlides.forEach(slide => {
-                const media = slide.querySelector('img, video');
-                if (media && media.style.aspectRatio) {
-                    const ratioStr = media.style.aspectRatio;
+                if (slide.hasAttribute('data-ratio')) {
+                    const ratioStr = slide.getAttribute('data-ratio');
                     const parts = ratioStr.split('/');
                     if (parts.length === 2) {
                         const ratio = parseFloat(parts[0]) / parseFloat(parts[1]);
