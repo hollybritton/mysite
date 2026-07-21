@@ -73,19 +73,28 @@
             const originalSlides = Array.from(container.children);
             
             // Force explicit pixel widths on every slide to bypass Safari flexbox collapse bugs
-            const h = container.clientHeight;
+            // Use window.innerHeight mathematically to prevent container.clientHeight from returning 0 on load
+            const h = window.innerHeight * 0.85;
             originalSlides.forEach(slide => {
                 if (slide.hasAttribute('data-ratio')) {
                     const ratioStr = slide.getAttribute('data-ratio');
                     const parts = ratioStr.split('/');
                     if (parts.length === 2) {
                         const ratio = parseFloat(parts[0]) / parseFloat(parts[1]);
-                        slide.style.width = (h * ratio) + 'px';
+                        const pxWidth = (h * ratio) + 'px';
+                        slide.style.width = pxWidth;
+                        slide.style.minWidth = pxWidth; // Force flexbox to respect the width
                     }
                 }
             });
 
-            const cloneMultiplier = 3; // 1 original + 3 clones = 4 sets total (keeps width safe for mobile GPUs)
+            // Calculate exact width of one set
+            let singleSetWidth = 0;
+            originalSlides.forEach(slide => {
+                singleSetWidth += parseFloat(slide.style.width) || 0;
+            });
+
+            const cloneMultiplier = 3; // 1 original + 3 clones = 4 sets total
             const middleSetIndex = 1;
 
             // Clone sets to create the buffer
@@ -95,19 +104,16 @@
                 });
             }
 
-            // Calculate exact width of one set
-            let singleSetWidth = 0;
-            originalSlides.forEach(slide => {
-                singleSetWidth += parseFloat(slide.style.width);
-            });
+            // Force Safari to recalculate the massive new layout boundaries before we attempt to scroll
+            void container.scrollWidth;
 
-            // Perform the jump synchronously BEFORE fading out the loader
-            container.style.scrollBehavior = 'auto';
-            container.scrollLeft = singleSetWidth * middleSetIndex;
-            
-            // Force Safari to physically paint the new scroll position before revealing
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
+            // Execute the jump in a short timeout to guarantee the DOM has physically expanded
+            setTimeout(() => {
+                container.style.scrollBehavior = 'auto';
+                container.scrollLeft = singleSetWidth * middleSetIndex;
+                
+                // Force a micro-scroll to physically flush the Safari paint pipeline before revealing
+                setTimeout(() => {
                     container.scrollLeft += 1;
                     container.scrollLeft -= 1;
                     container.style.scrollBehavior = 'smooth';
@@ -118,8 +124,8 @@
                     setTimeout(() => {
                         loader.style.display = 'none';
                     }, 500);
-                });
-            });
+                }, 50);
+            }, 50);
 
             // Lazy Load Videos for Performance (Staggered to prevent scroll stutter)
             const videoObserver = new IntersectionObserver((entries) => {
