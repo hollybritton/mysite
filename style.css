@@ -126,8 +126,11 @@ body, html {
 }
 
 .slide img, .slide video {
+    /* Fill the wrapper, which is already sized by its aspect-ratio.
+       Prevents an unloaded <video> from collapsing to the 300x150 CSS
+       default and leaving a gap inside its correctly-sized slide. */
     height: 100%;
-    width: auto;
+    width: 100%;
     object-fit: contain;
     display: block;
 }

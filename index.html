@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="ampersand.png?v=2">
     <!-- Preload the critical first image so it appears instantly -->
     <link rel="preload" as="image" href="portfolio_projects/rut_holly/wedding_invite.png">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
     <div class="loader"></div>
@@ -35,7 +35,7 @@
             <img src="portfolio_projects/rut_holly/wedding_invite.png" alt="Wedding Invite">
         </div>
         <div class="slide" style="aspect-ratio: 1542/1080;">
-            <video loop muted playsinline preload="none" data-src="portfolio_projects/rut_holly/Untitled - July 13, 2026 at 12.37.45 (2).mp4">
+            <video loop muted playsinline preload="none" data-src="portfolio_projects/rut_holly/booklet.mp4">
             </video>
         </div>
         <div class="slide" style="aspect-ratio: 1000/1500;">
@@ -71,10 +71,16 @@
         window.addEventListener('load', () => {
             const container = document.getElementById('scrollContainer');
             const originalSlides = Array.from(container.children);
+            // Declared out here so the scroll teleport and the resize re-anchor below share a
+            // single binding. Scoped inside the timeout it was unreachable from those handlers.
+            let singleSetWidth = 0;
+            // Where we are within set 1, as a 0-1 fraction, recorded while the layout is still
+            // valid. On resize scrollLeft is already stale, so it cannot be derived after the
+            // fact — it has to be remembered from before. 0 = anchored on the first slide.
+            let positionInSet = 0;
             // Wait a micro-tick to ensure CSS aspect-ratios have populated offsetWidth
             setTimeout(() => {
                 // Calculate exact width of one set directly from the CSS engine's layout
-                let singleSetWidth = 0;
                 originalSlides.forEach(slide => {
                     singleSetWidth += slide.offsetWidth;
                 });
@@ -88,6 +94,16 @@
                     container.appendChild(slide.cloneNode(true));
                 });
             }
+
+            // Clones only exist as of this tick, so register every video — originals AND
+            // clones — with the observer. Observing an element twice is a no-op, and without
+            // this the cloned sets we teleport into would never load and would render blank.
+            container.querySelectorAll('video').forEach(video => videoObserver.observe(video));
+
+            // Re-derive the set width from the real layout position of set 1's first slide.
+            // Summing offsetWidth accumulates per-slide integer rounding; offsetLeft is the
+            // actual anchor the browser will scroll to.
+            singleSetWidth = container.children[originalSlides.length].offsetLeft;
 
             // Force Safari to recalculate the massive new layout boundaries before we attempt to scroll
             void container.scrollWidth;
@@ -135,7 +151,7 @@
                 });
             }, {
                 root: container,
-                rootMargin: '200px 0px' // Keep tight to prevent Safari network/CPU choke
+                rootMargin: '0px 200px' // Horizontal scroller: margin must be on the left/right axis
             });
 
             container.querySelectorAll('video').forEach(video => {
@@ -163,6 +179,34 @@
                         void container.offsetHeight;
                         container.style.scrollBehavior = 'smooth';
                     }
+
+                    // Record the settled position while this layout is still the live one.
+                    if (singleSetWidth) {
+                        positionInSet = (container.scrollLeft - singleSetWidth) / singleSetWidth;
+                    }
+                }, 150);
+            });
+
+            // Slide widths are derived from viewport HEIGHT (height: Nvh + aspect-ratio), so any
+            // viewport resize rescales the entire horizontal track. Mobile Safari collapsing its
+            // address bar moments after load is exactly this: the track shrinks/grows but
+            // scrollLeft keeps its old pixel value and you land mid-sequence instead of on the
+            // first slide. Re-measure and re-anchor, preserving relative position within the set.
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+
+                resizeTimeout = setTimeout(() => {
+                    // Re-measure against the NEW layout, then restore the position we recorded
+                    // while the old layout was still valid. Deriving it from the current
+                    // scrollLeft would just carry the stale offset forward.
+                    singleSetWidth = container.children[originalSlides.length].offsetLeft;
+                    if (!singleSetWidth) return;
+
+                    container.style.scrollBehavior = 'auto';
+                    container.scrollLeft = singleSetWidth + (positionInSet * singleSetWidth);
+                    void container.offsetHeight;
+                    container.style.scrollBehavior = 'smooth';
                 }, 150);
             });
 
