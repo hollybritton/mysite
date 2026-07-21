@@ -151,13 +151,11 @@ body, html {
     position: fixed;
     top: 57.5vh; /* Center vertically within the 85vh image frame (15vh + 85vh/2) */
     transform: translateY(-50%);
-    width: 25px; /* Adjust size as needed */
+    width: 60px; /* Increased from 25px in case of transparent padding */
     height: auto;
     z-index: 50;
     cursor: pointer;
-    /* CSS magic to make it dynamically change color based on the background */
-    mix-blend-mode: difference;
-    filter: invert(1);
+    /* CSS magic temporarily removed to debug visibility */
     transition: transform 0.2s ease;
 }
 
