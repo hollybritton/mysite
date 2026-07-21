@@ -119,6 +119,10 @@ body, html {
     flex: 0 0 auto;
     width: auto;
     position: relative;
+    /* Force Safari to hardware-accelerate and paint the element immediately */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 
 .slide img, .slide video {

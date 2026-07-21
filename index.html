@@ -104,15 +104,22 @@
             // Perform the jump synchronously BEFORE fading out the loader
             container.style.scrollBehavior = 'auto';
             container.scrollLeft = singleSetWidth * middleSetIndex;
-            void container.offsetHeight; // Reflow
-            container.style.scrollBehavior = 'smooth';
+            
+            // Force Safari to physically paint the new scroll position before revealing
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    container.scrollLeft += 1;
+                    container.scrollLeft -= 1;
+                    container.style.scrollBehavior = 'smooth';
 
-            // Now that layout is perfect, fade out loader
-            const loader = document.querySelector('.loader');
-            loader.style.opacity = '0';
-            setTimeout(() => {
-                loader.style.display = 'none';
-            }, 500);
+                    // Now that layout and paint are perfect, fade out loader
+                    const loader = document.querySelector('.loader');
+                    loader.style.opacity = '0';
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                    }, 500);
+                });
+            });
 
             // Lazy Load Videos for Performance (Staggered to prevent scroll stutter)
             const videoObserver = new IntersectionObserver((entries) => {
