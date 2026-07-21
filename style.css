@@ -130,4 +130,28 @@ body, html {
     .horizontal-scroll, .slide {
         height: 80vh;
     }
+    .ampersand-btn {
+        right: 1.5rem;
+        width: 40px;
+    }
+}
+
+/* Fixed Dynamic Scroll Button */
+.ampersand-btn {
+    position: fixed;
+    top: 50%;
+    right: 3rem;
+    transform: translateY(-50%);
+    width: 60px; /* Adjust size as needed */
+    height: auto;
+    z-index: 50;
+    cursor: pointer;
+    /* CSS magic to make it dynamically change color based on the background */
+    mix-blend-mode: difference;
+    filter: invert(1);
+    transition: transform 0.2s ease;
+}
+
+.ampersand-btn:hover {
+    transform: translateY(-50%) scale(1.1);
 }

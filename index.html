@@ -20,6 +20,9 @@
         </div>
     </div>
 
+    <!-- Fixed Dynamic Scroll Button -->
+    <img src="ampersand.png" alt="Scroll Right" class="ampersand-btn" id="scrollBtn">
+
     <!-- Horizontal Scroll Gallery -->
     <main class="horizontal-scroll" id="scrollContainer">
         
@@ -175,6 +178,14 @@
                     container.scrollLeft += evt.deltaY;
                 }
             }, { passive: false });
+
+            // Ampersand Scroll Button Logic
+            const scrollBtn = document.getElementById('scrollBtn');
+            scrollBtn.addEventListener('click', () => {
+                // Scroll right by approximately half a viewport width per click
+                const scrollAmount = window.innerWidth * 0.6; 
+                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            });
         });
     </script>
 </body>
