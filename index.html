@@ -25,39 +25,37 @@
         
         <!-- Rut & Holly -->
         <div class="slide">
-            <img src="portfolio_projects/rut&holly/wedding_invite.png" alt="Wedding Invite">
+            <img src="portfolio_projects/rut&holly/wedding_invite.png" alt="Wedding Invite" loading="lazy">
         </div>
         <div class="slide">
-            <video autoplay loop muted playsinline>
-                <source src="portfolio_projects/rut&holly/Untitled - July 13, 2026 at 12.37.45 (2).mp4" type="video/mp4">
+            <video loop muted playsinline preload="none" data-src="portfolio_projects/rut&holly/Untitled - July 13, 2026 at 12.37.45 (2).mp4">
             </video>
         </div>
         <div class="slide">
-            <img src="portfolio_projects/rut&holly/tati.png" alt="Tati">
+            <img src="portfolio_projects/rut&holly/tati.png" alt="Tati" loading="lazy">
         </div>
         <div class="slide">
-            <video autoplay loop muted playsinline>
-                <source src="portfolio_projects/rut&holly/foldout.mp4" type="video/mp4">
+            <video loop muted playsinline preload="none" data-src="portfolio_projects/rut&holly/foldout.mp4">
             </video>
         </div>
 
         <!-- Indie & Harry -->
         <div class="slide">
-            <img src="portfolio_projects/indie&harry/invite_final.png" alt="Invite">
+            <img src="portfolio_projects/indie&harry/invite_final.png" alt="Invite" loading="lazy">
         </div>
         <div class="slide">
-            <img src="portfolio_projects/indie&harry/flower.png" alt="Flower">
+            <img src="portfolio_projects/indie&harry/flower.png" alt="Flower" loading="lazy">
         </div>
         <div class="slide">
-            <img src="portfolio_projects/indie&harry/map_2.png" alt="Map 2">
+            <img src="portfolio_projects/indie&harry/map_2.png" alt="Map 2" loading="lazy">
         </div>
 
         <!-- Found -->
         <div class="slide">
-            <img src="portfolio_projects/found/blue_speakers.png" alt="Blue Speakers">
+            <img src="portfolio_projects/found/blue_speakers.png" alt="Blue Speakers" loading="lazy">
         </div>
         <div class="slide">
-            <img src="portfolio_projects/found/logo_test1.png" alt="Found Logo Test">
+            <img src="portfolio_projects/found/logo_test1.png" alt="Found Logo Test" loading="lazy">
         </div>
     </main>
     
@@ -84,9 +82,32 @@
                 });
             }
 
-            // Autoplay any cloned videos
+            // Lazy Load Videos for Performance
+            const videoObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const video = entry.target;
+                    if (entry.isIntersecting) {
+                        // Inject source if it hasn't been injected yet
+                        if (!video.querySelector('source')) {
+                            const source = document.createElement('source');
+                            source.src = video.getAttribute('data-src');
+                            source.type = 'video/mp4';
+                            video.appendChild(source);
+                            video.load(); // Tell browser to load the new source
+                        }
+                        video.play().catch(e => console.log('Autoplay prevented:', e));
+                    } else {
+                        // Pause video when out of view to save CPU/battery
+                        video.pause();
+                    }
+                });
+            }, {
+                root: container,
+                rootMargin: '2000px 0px' // Start buffering when it's 2000px away (approx 1-2 viewports)
+            });
+
             container.querySelectorAll('video').forEach(video => {
-                video.play().catch(e => console.log('Autoplay prevented:', e));
+                videoObserver.observe(video);
             });
 
             // Identify the exact DOM element we want to start on (first slide of the middle set)
