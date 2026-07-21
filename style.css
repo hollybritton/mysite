@@ -135,26 +135,8 @@ body, html {
     display: block;
 }
 
-/* On mobile the inline film is replaced by a tappable poster that opens video.html.
-   Streaming a multi-megabyte film inline is the worst thing to ask of the connection
-   least able to serve it; the poster is already downloaded, so the slide is never blank. */
-.film-link {
-    display: none;
-}
-
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    /* Needs to outrank `.slide video` above, which is more specific than a lone class. */
-    .slide video.film-inline {
-        display: none;
-    }
-
-    .film-link {
-        display: block;
-        height: 100%;
-        width: 100%;
-    }
-
     .top-container {
         padding: 1.5rem;
         height: auto; 
