@@ -72,6 +72,20 @@
             const container = document.getElementById('scrollContainer');
             const originalSlides = Array.from(container.children);
             
+            // Force explicit pixel widths on every slide to bypass Safari flexbox collapse bugs
+            const h = container.clientHeight;
+            originalSlides.forEach(slide => {
+                const media = slide.querySelector('img, video');
+                if (media && media.style.aspectRatio) {
+                    const ratioStr = media.style.aspectRatio;
+                    const parts = ratioStr.split('/');
+                    if (parts.length === 2) {
+                        const ratio = parseFloat(parts[0]) / parseFloat(parts[1]);
+                        slide.style.width = (h * ratio) + 'px';
+                    }
+                }
+            });
+
             const cloneMultiplier = 40; 
             const middleSetIndex = 20;
 
