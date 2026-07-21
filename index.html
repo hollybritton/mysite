@@ -82,19 +82,27 @@
                 });
             }
 
-            // Lazy Load Videos for Performance
+            // Lazy Load Videos for Performance (Staggered to prevent scroll stutter)
             const videoObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
+                // Keep track of how many videos need to load in this batch to stagger them
+                let loadDelay = 0;
+                
+                entries.forEach((entry) => {
                     const video = entry.target;
                     if (entry.isIntersecting) {
                         // Inject source if it hasn't been injected yet
                         if (!video.querySelector('source')) {
-                            const source = document.createElement('source');
-                            source.src = video.getAttribute('data-src');
-                            source.type = 'video/mp4';
-                            video.appendChild(source);
-                            video.load(); // Tell browser to load the new source
+                            setTimeout(() => {
+                                const source = document.createElement('source');
+                                source.src = video.getAttribute('data-src');
+                                source.type = 'video/mp4';
+                                video.appendChild(source);
+                                // Don't call .load() as it can block the main thread; appending source is enough
+                            }, loadDelay);
+                            loadDelay += 150; // Stagger each video initialization by 150ms to prevent CPU spikes
                         }
+                        
+                        // Play the video (will naturally play once source is injected and buffered)
                         video.play().catch(e => console.log('Autoplay prevented:', e));
                     } else {
                         // Pause video when out of view to save CPU/battery
@@ -103,7 +111,7 @@
                 });
             }, {
                 root: container,
-                rootMargin: '2000px 0px' // Start buffering when it's 2000px away (approx 1-2 viewports)
+                rootMargin: '4000px 0px' // Start buffering extremely early so the CPU spike happens far away from the viewer
             });
 
             container.querySelectorAll('video').forEach(video => {
