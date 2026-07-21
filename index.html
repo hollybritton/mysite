@@ -39,7 +39,7 @@
             </video>
         </div>
         <div class="slide" style="aspect-ratio: 1000/1500;">
-            <img src="portfolio_projects/rut_holly/tati.png" alt="Tati">
+            <img src="portfolio_projects/rut_holly/tati.png" loading="lazy" decoding="async" alt="Tati">
         </div>
         <div class="slide" style="aspect-ratio: 2498/2558;">
             <video loop muted playsinline preload="none" poster="portfolio_projects/rut_holly/foldout_poster.jpg" data-src="portfolio_projects/rut_holly/foldout.mp4">
@@ -48,27 +48,30 @@
 
         <!-- Indie & Harry -->
         <div class="slide" style="aspect-ratio: 1159/1500;">
-            <img src="portfolio_projects/indie_harry/invite_final.png" alt="Invite">
+            <img src="portfolio_projects/indie_harry/invite_final.png" loading="lazy" decoding="async" alt="Invite">
         </div>
         <div class="slide" style="aspect-ratio: 1159/1500;">
-            <img src="portfolio_projects/indie_harry/flower.png" alt="Flower">
+            <img src="portfolio_projects/indie_harry/flower.png" loading="lazy" decoding="async" alt="Flower">
         </div>
         <div class="slide" style="aspect-ratio: 1159/1500;">
-            <img src="portfolio_projects/indie_harry/map_2.png" alt="Map 2">
+            <img src="portfolio_projects/indie_harry/map_2.png" loading="lazy" decoding="async" alt="Map 2">
         </div>
 
         <!-- Found -->
         <div class="slide" style="aspect-ratio: 1500/1001;">
-            <img src="portfolio_projects/found/blue_speakers.png" alt="Blue Speakers">
+            <img src="portfolio_projects/found/blue_speakers.png" loading="lazy" decoding="async" alt="Blue Speakers">
         </div>
         <div class="slide" style="aspect-ratio: 1071/1500;">
-            <img src="portfolio_projects/found/logo_test1.png" alt="Found Logo Test">
+            <img src="portfolio_projects/found/logo_test1.png" loading="lazy" decoding="async" alt="Found Logo Test">
         </div>
     </main>
     
     <script>
-        // Wait for all images to fully download before executing layout math
-        window.addEventListener('load', () => {
+        // Run as soon as the DOM is parsed, NOT on window 'load'. Every slide is sized by an
+        // explicit CSS aspect-ratio, so the layout math needs no image to have downloaded.
+        // Waiting for 'load' meant waiting on ~19MB of artwork before the loader overlay could
+        // be dismissed — which on a mobile connection is a blank screen for many seconds.
+        document.addEventListener('DOMContentLoaded', () => {
             const container = document.getElementById('scrollContainer');
             const originalSlides = Array.from(container.children);
             // Declared out here so the scroll teleport and the resize re-anchor below share a
@@ -78,6 +81,19 @@
             // valid. On resize scrollLeft is already stale, so it cannot be derived after the
             // fact — it has to be remembered from before. 0 = anchored on the first slide.
             let positionInSet = 0;
+
+            // Failsafe: the loader is a full-screen opaque overlay, so anything that stops the
+            // init chain leaves the visitor staring at a blank screen with no way out. Never let
+            // it outlive this timeout, whatever else happens.
+            const revealLoader = () => {
+                const loader = document.querySelector('.loader');
+                if (!loader || loader.dataset.dismissed) return;
+                loader.dataset.dismissed = '1';
+                loader.style.opacity = '0';
+                setTimeout(() => { loader.style.display = 'none'; }, 500);
+            };
+            setTimeout(revealLoader, 1500);
+
             // Wait a micro-tick to ensure CSS aspect-ratios have populated offsetWidth
             setTimeout(() => {
                 // Calculate exact width of one set directly from the CSS engine's layout
@@ -120,11 +136,7 @@
                     container.style.scrollBehavior = 'smooth';
 
                     // Now that layout and paint are perfect, fade out loader
-                    const loader = document.querySelector('.loader');
-                    loader.style.opacity = '0';
-                    setTimeout(() => {
-                        loader.style.display = 'none';
-                    }, 500);
+                    revealLoader();
             }, 50); // End of micro-scroll timeout
             }, 50); // End of layout expand timeout
             }, 0); // End of initialization timeout
