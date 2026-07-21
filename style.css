@@ -151,7 +151,7 @@ body, html {
     position: fixed;
     top: 57.5vh; /* Center vertically within the 85vh image frame (15vh + 85vh/2) */
     transform: translateY(-50%);
-    width: 60px; /* Increased from 25px in case of transparent padding */
+    width: 80px; /* Increased for better visibility */
     height: auto;
     z-index: 50;
     cursor: pointer;
