@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio HMB</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="loader"></div>
+
+    <!-- Top Text Container -->
+    <div class="top-container">
+        <p class="description">
+            <strong>Holly Mia Britton</strong> is a British-American artist, designer, and creative director who graduated from Parsons, The New School. Her craft includes commissioned artworks, custom stationery, visual identities, and creative direction for select clients.
+        </p>
+        <div class="links">
+            <a href="mailto:hollybrittondesign@gmail.com" class="hover-link">Email ↗</a>
+            <a href="https://www.instagram.com/hollymia" target="_blank" class="hover-link">Instagram ↗</a>
+        </div>
+    </div>
+
+    <!-- Horizontal Scroll Gallery -->
+    <main class="horizontal-scroll" id="scrollContainer">
+        
+        <!-- Rut & Holly -->
+        <div class="slide">
+            <img src="portfolio_projects/rut&holly/wedding_invite.png" alt="Wedding Invite">
+        </div>
+        <div class="slide">
+            <video autoplay loop muted playsinline>
+                <source src="portfolio_projects/rut&holly/Untitled - July 13, 2026 at 12.37.45 (2).mp4" type="video/mp4">
+            </video>
+        </div>
+        <div class="slide">
+            <img src="portfolio_projects/rut&holly/tati.png" alt="Tati">
+        </div>
+        <div class="slide">
+            <video autoplay loop muted playsinline>
+                <source src="portfolio_projects/rut&holly/foldout.mp4" type="video/mp4">
+            </video>
+        </div>
+
+        <!-- Indie & Harry -->
+        <div class="slide">
+            <img src="portfolio_projects/indie&harry/invite_final.png" alt="Invite">
+        </div>
+        <div class="slide">
+            <img src="portfolio_projects/indie&harry/flower.png" alt="Flower">
+        </div>
+        <div class="slide">
+            <img src="portfolio_projects/indie&harry/map_2.png" alt="Map 2">
+        </div>
+
+        <!-- Found -->
+        <div class="slide">
+            <img src="portfolio_projects/found/blue_speakers.png" alt="Blue Speakers">
+        </div>
+        <div class="slide">
+            <img src="portfolio_projects/found/logo_test1.png" alt="Found Logo Test">
+        </div>
+    </main>
+    
+    <script>
+        // Fade out loader
+        window.addEventListener('load', () => {
+            const loader = document.querySelector('.loader');
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 500);
+
+            // True Native Infinite Scroll (Massive Buffer Approach)
+            const container = document.getElementById('scrollContainer');
+            const originalSlides = Array.from(container.children);
+            
+            const cloneMultiplier = 40; 
+            const middleSetIndex = 20;
+
+            // Clone sets to create the massive buffer
+            for (let i = 0; i < cloneMultiplier; i++) {
+                originalSlides.forEach(slide => {
+                    container.appendChild(slide.cloneNode(true));
+                });
+            }
+
+            // Autoplay any cloned videos
+            container.querySelectorAll('video').forEach(video => {
+                video.play().catch(e => console.log('Autoplay prevented:', e));
+            });
+
+            // Identify the exact DOM element we want to start on (first slide of the middle set)
+            const targetSlideIndex = middleSetIndex * originalSlides.length;
+            const targetSlide = container.children[targetSlideIndex];
+
+            const jumpToCenter = () => {
+                container.style.scrollBehavior = 'auto';
+                // offsetLeft gives the exact pixel coordinate of the element, avoiding all subpixel division errors
+                container.scrollLeft = targetSlide.offsetLeft;
+                void container.offsetHeight; // Reflow
+                container.style.scrollBehavior = 'smooth';
+            };
+
+            // Jump immediately
+            setTimeout(jumpToCenter, 100);
+
+            // If videos load metadata later and push the layout, re-anchor (only if the user hasn't touched the scroll yet)
+            let hasUserInteracted = false;
+            container.addEventListener('wheel', () => hasUserInteracted = true, { once: true });
+            container.addEventListener('touchstart', () => hasUserInteracted = true, { once: true });
+            container.addEventListener('mousedown', () => hasUserInteracted = true, { once: true });
+            
+            container.querySelectorAll('video').forEach(v => {
+                v.addEventListener('loadedmetadata', () => {
+                    if (!hasUserInteracted) jumpToCenter();
+                });
+            });
+
+            // Safety-net teleport
+            let scrollTimeout;
+            container.addEventListener('scroll', () => {
+                clearTimeout(scrollTimeout);
+                
+                scrollTimeout = setTimeout(() => {
+                    const currentScroll = container.scrollLeft;
+                    
+                    // Approximate width is fine for detecting if we hit the boundaries
+                    const singleSetWidthApprox = container.scrollWidth / (cloneMultiplier + 1);
+
+                    if (currentScroll < singleSetWidthApprox * 2) {
+                        // Always teleport to the exact DOM coordinate
+                        container.scrollLeft = targetSlide.offsetLeft;
+                        void container.offsetHeight;
+                    } 
+                    else if (currentScroll > singleSetWidthApprox * (cloneMultiplier - 2)) {
+                        container.scrollLeft = targetSlide.offsetLeft;
+                        void container.offsetHeight;
+                    }
+                }, 200);
+            });
+
+            // Enable horizontal scrolling with mouse wheel/trackpad
+            container.addEventListener('wheel', (evt) => {
+                if (evt.deltaY !== 0) {
+                    evt.preventDefault();
+                    container.scrollLeft += evt.deltaY;
+                }
+            }, { passive: false });
+        });
+    </script>
+</body>
+</html>

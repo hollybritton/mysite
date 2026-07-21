@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio HMB - Option 2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --font-sans: 'Inter', sans-serif;
+            --font-serif: 'Instrument Serif', serif;
+            --bg-turquoise: #40e0d0; /* Turquoise blue */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-turquoise);
+            color: #000;
+            font-family: var(--font-sans);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        /* Left Panel: Text and About Image */
+        .left-panel {
+            width: 50%;
+            padding: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .about-image {
+            width: 220px;
+            height: auto;
+            margin-bottom: 3rem;
+            border-radius: 2px;
+        }
+
+        .description {
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            line-height: 1.1;
+            margin-bottom: 3rem;
+            max-width: 500px;
+        }
+
+        .description strong {
+            font-weight: normal;
+        }
+
+        .links {
+            display: flex;
+            gap: 2rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .links a {
+            color: #000;
+            text-decoration: none;
+            position: relative;
+            padding-bottom: 4px;
+        }
+
+        .links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background-color: #000;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s ease;
+        }
+
+        .links a:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        /* Right Panel: Filtering Slideshow */
+        .right-panel {
+            width: 50%;
+            position: relative;
+            cursor: e-resize; /* Indicates clicking to go next */
+            background-color: var(--bg-turquoise);
+        }
+
+        .media-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+            pointer-events: none;
+            padding: 3rem;
+        }
+
+        .media-slide.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .media-slide img, .media-slide video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .instruction {
+            position: absolute;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+                overflow-y: auto;
+                height: auto;
+            }
+            .left-panel, .right-panel {
+                width: 100%;
+                height: 100vh;
+                border-right: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Left Side: Info -->
+        <div class="left-panel">
+            <img src="portfolio_projects/%20.JPG" alt="Holly Rosenborg Britton" class="about-image">
+            <p class="description">
+                <strong>Studio HMB</strong> is a British-American studio represented by Holly Rosenborg Britton, an artist, designer, and creative director who graduated from Parsons, The New School. Her craft includes commissioned artworks, custom stationery, visual identities, and creative direction for select clients.
+            </p>
+            <div class="links">
+                <a href="mailto:hello@example.com">Email ↗</a>
+                <a href="https://instagram.com" target="_blank">Instagram ↗</a>
+            </div>
+        </div>
+
+        <!-- Right Side: Filterable Images -->
+        <div class="right-panel" id="galleryArea">
+            <div class="instruction">Click to filter next</div>
+            
+            <!-- Found -->
+            <div class="media-slide active">
+                <img src="portfolio_projects/found/blue_speakers.png" alt="Blue Speakers">
+            </div>
+            <div class="media-slide">
+                <img src="portfolio_projects/found/foundsystems_poster.png" alt="Found Poster">
+            </div>
+            
+            <!-- Rut & Holly -->
+            <div class="media-slide">
+                <img src="portfolio_projects/rut&holly/wedding_invite.png" alt="Wedding Invite">
+            </div>
+            <div class="media-slide">
+                <img src="portfolio_projects/rut&holly/tati.png" alt="Tati">
+            </div>
+            <div class="media-slide">
+                <video autoplay loop muted playsinline>
+                    <source src="portfolio_projects/rut&holly/foldout.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="media-slide">
+                <video autoplay loop muted playsinline>
+                    <source src="portfolio_projects/rut&holly/booklet.mp4" type="video/mp4">
+                </video>
+            </div>
+
+            <!-- Indie & Harry -->
+            <div class="media-slide">
+                <img src="portfolio_projects/indie&harry/invite_final.png" alt="Invite">
+            </div>
+            <div class="media-slide">
+                <img src="portfolio_projects/indie&harry/flower.png" alt="Flower">
+            </div>
+            <div class="media-slide">
+                <img src="portfolio_projects/indie&harry/map_2.png" alt="Map">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple JS to filter through the images on click
+        const galleryArea = document.getElementById('galleryArea');
+        const slides = document.querySelectorAll('.media-slide');
+        let currentIndex = 0;
+
+        galleryArea.addEventListener('click', () => {
+            // Remove active class from current
+            slides[currentIndex].classList.remove('active');
+            
+            // Increment index, loop back to 0 if at the end
+            currentIndex = (currentIndex + 1) % slides.length;
+            
+            // Add active class to new slide
+            slides[currentIndex].classList.add('active');
+        });
+    </script>
+</body>
+</html>
