@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>HMB Design</title>
     <link rel="icon" type="image/png" href="ampersand.png?v=2">
-    <link rel="stylesheet" href="style.css?v=9">
+    <link rel="stylesheet" href="style.css?v=10">
 </head>
 <body class="video-page">
     <a href="index.html" class="video-back" aria-label="Back to gallery">&#123;</a>
@@ -21,8 +21,14 @@
         // never built from user input — an unknown key falls through to the message below
         // rather than pointing a <video> at whatever the URL asked for.
         const FILMS = {
-            booklet: { src: 'portfolio_projects/rut_holly/booklet.mp4' },
-            foldout: { src: 'portfolio_projects/rut_holly/foldout.mp4' }
+            booklet: {
+                src: 'portfolio_projects/rut_holly/booklet.mp4',
+                poster: 'portfolio_projects/rut_holly/booklet_poster.jpg'
+            },
+            foldout: {
+                src: 'portfolio_projects/rut_holly/foldout.mp4',
+                poster: 'portfolio_projects/rut_holly/foldout_poster.jpg'
+            }
         };
 
         const key = new URLSearchParams(window.location.search).get('v');
@@ -30,6 +36,9 @@
         const player = document.getElementById('player');
 
         if (film) {
+            // Poster first so a frame is on screen while the file loads, rather than
+            // dropping the visitor onto a black rectangle.
+            player.setAttribute('poster', film.poster);
             player.setAttribute('src', film.src);
         } else {
             document.querySelector('.video-stage').hidden = true;
