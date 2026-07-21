@@ -85,23 +85,25 @@
                 }
             });
 
-            const cloneMultiplier = 40; 
-            const middleSetIndex = 20;
+            const cloneMultiplier = 3; // 1 original + 3 clones = 4 sets total (keeps width safe for mobile GPUs)
+            const middleSetIndex = 1;
 
-            // Clone sets to create the massive buffer
+            // Clone sets to create the buffer
             for (let i = 0; i < cloneMultiplier; i++) {
                 originalSlides.forEach(slide => {
                     container.appendChild(slide.cloneNode(true));
                 });
             }
 
-            // Identify the exact DOM element we want to start on
-            const targetSlideIndex = middleSetIndex * originalSlides.length;
-            const targetSlide = container.children[targetSlideIndex];
+            // Calculate exact width of one set
+            let singleSetWidth = 0;
+            originalSlides.forEach(slide => {
+                singleSetWidth += parseFloat(slide.style.width);
+            });
 
             // Perform the jump synchronously BEFORE fading out the loader
             container.style.scrollBehavior = 'auto';
-            container.scrollLeft = targetSlide.offsetLeft;
+            container.scrollLeft = singleSetWidth * middleSetIndex;
             void container.offsetHeight; // Reflow
             container.style.scrollBehavior = 'smooth';
 
@@ -143,7 +145,7 @@
 
             // Cleanup: No need for loadedmetadata re-anchoring since we use explicit pixel widths now
 
-            // Safety-net teleport
+            // Safety-net teleport (Debounced to only run after momentum scrolling stops)
             let scrollTimeout;
             container.addEventListener('scroll', () => {
                 clearTimeout(scrollTimeout);
@@ -151,19 +153,18 @@
                 scrollTimeout = setTimeout(() => {
                     const currentScroll = container.scrollLeft;
                     
-                    // Approximate width is fine for detecting if we hit the boundaries
-                    const singleSetWidthApprox = container.scrollWidth / (cloneMultiplier + 1);
-
-                    if (currentScroll < singleSetWidthApprox * 2) {
-                        // Always teleport to the exact DOM coordinate
-                        container.scrollLeft = targetSlide.offsetLeft;
+                    // If user scrolls out of the middle set (Set 1)
+                    if (currentScroll < singleSetWidth || currentScroll >= singleSetWidth * 2) {
+                        // Find their exact visual sub-pixel offset within whatever set they landed in
+                        const offsetWithinSet = currentScroll % singleSetWidth;
+                        
+                        // Teleport them silently back to Set 1 at the exact same visual offset
+                        container.style.scrollBehavior = 'auto';
+                        container.scrollLeft = singleSetWidth + offsetWithinSet;
                         void container.offsetHeight;
-                    } 
-                    else if (currentScroll > singleSetWidthApprox * (cloneMultiplier - 2)) {
-                        container.scrollLeft = targetSlide.offsetLeft;
-                        void container.offsetHeight;
+                        container.style.scrollBehavior = 'smooth';
                     }
-                }, 200);
+                }, 150);
             });
 
             // Enable horizontal scrolling with mouse wheel/trackpad
