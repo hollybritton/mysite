@@ -39,7 +39,7 @@
             </video>
         </div>
         <div class="slide">
-            <img src="portfolio_projects/rut&holly/tati.png" alt="Tati" loading="lazy" style="aspect-ratio: 1000/1500;">
+            <img src="portfolio_projects/rut&holly/tati.png" alt="Tati" style="aspect-ratio: 1000/1500;">
         </div>
         <div class="slide">
             <video loop muted playsinline preload="none" data-src="portfolio_projects/rut&holly/foldout.mp4" style="aspect-ratio: 2498/2558;">
@@ -48,34 +48,27 @@
 
         <!-- Indie & Harry -->
         <div class="slide">
-            <img src="portfolio_projects/indie&harry/invite_final.png" alt="Invite" loading="lazy" style="aspect-ratio: 1159/1500;">
+            <img src="portfolio_projects/indie&harry/invite_final.png" alt="Invite" style="aspect-ratio: 1159/1500;">
         </div>
         <div class="slide">
-            <img src="portfolio_projects/indie&harry/flower.png" alt="Flower" loading="lazy" style="aspect-ratio: 1159/1500;">
+            <img src="portfolio_projects/indie&harry/flower.png" alt="Flower" style="aspect-ratio: 1159/1500;">
         </div>
         <div class="slide">
-            <img src="portfolio_projects/indie&harry/map_2.png" alt="Map 2" loading="lazy" style="aspect-ratio: 1159/1500;">
+            <img src="portfolio_projects/indie&harry/map_2.png" alt="Map 2" style="aspect-ratio: 1159/1500;">
         </div>
 
         <!-- Found -->
         <div class="slide">
-            <img src="portfolio_projects/found/blue_speakers.png" alt="Blue Speakers" loading="lazy" style="aspect-ratio: 1500/1001;">
+            <img src="portfolio_projects/found/blue_speakers.png" alt="Blue Speakers" style="aspect-ratio: 1500/1001;">
         </div>
         <div class="slide">
-            <img src="portfolio_projects/found/logo_test1.png" alt="Found Logo Test" loading="lazy" style="aspect-ratio: 1071/1500;">
+            <img src="portfolio_projects/found/logo_test1.png" alt="Found Logo Test" style="aspect-ratio: 1071/1500;">
         </div>
     </main>
     
     <script>
-        // Fade out loader
+        // Wait for all images to fully download before executing layout math
         window.addEventListener('load', () => {
-            const loader = document.querySelector('.loader');
-            loader.style.opacity = '0';
-            setTimeout(() => {
-                loader.style.display = 'none';
-            }, 500);
-
-            // True Native Infinite Scroll (Massive Buffer Approach)
             const container = document.getElementById('scrollContainer');
             const originalSlides = Array.from(container.children);
             
@@ -89,56 +82,51 @@
                 });
             }
 
+            // Identify the exact DOM element we want to start on
+            const targetSlideIndex = middleSetIndex * originalSlides.length;
+            const targetSlide = container.children[targetSlideIndex];
+
+            // Perform the jump synchronously BEFORE fading out the loader
+            container.style.scrollBehavior = 'auto';
+            container.scrollLeft = targetSlide.offsetLeft;
+            void container.offsetHeight; // Reflow
+            container.style.scrollBehavior = 'smooth';
+
+            // Now that layout is perfect, fade out loader
+            const loader = document.querySelector('.loader');
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 500);
+
             // Lazy Load Videos for Performance (Staggered to prevent scroll stutter)
             const videoObserver = new IntersectionObserver((entries) => {
-                // Keep track of how many videos need to load in this batch to stagger them
                 let loadDelay = 0;
-                
                 entries.forEach((entry) => {
                     const video = entry.target;
                     if (entry.isIntersecting) {
-                        // Inject source if it hasn't been injected yet
                         if (!video.querySelector('source')) {
                             setTimeout(() => {
                                 const source = document.createElement('source');
                                 source.src = video.getAttribute('data-src');
                                 source.type = 'video/mp4';
                                 video.appendChild(source);
-                                // Don't call .load() as it can block the main thread; appending source is enough
                             }, loadDelay);
-                            loadDelay += 150; // Stagger each video initialization by 150ms to prevent CPU spikes
+                            loadDelay += 150;
                         }
-                        
-                        // Play the video (will naturally play once source is injected and buffered)
                         video.play().catch(e => console.log('Autoplay prevented:', e));
                     } else {
-                        // Pause video when out of view to save CPU/battery
                         video.pause();
                     }
                 });
             }, {
                 root: container,
-                rootMargin: '4000px 0px' // Start buffering extremely early so the CPU spike happens far away from the viewer
+                rootMargin: '4000px 0px'
             });
 
             container.querySelectorAll('video').forEach(video => {
                 videoObserver.observe(video);
             });
-
-            // Identify the exact DOM element we want to start on (first slide of the middle set)
-            const targetSlideIndex = middleSetIndex * originalSlides.length;
-            const targetSlide = container.children[targetSlideIndex];
-
-            const jumpToCenter = () => {
-                container.style.scrollBehavior = 'auto';
-                // offsetLeft gives the exact pixel coordinate of the element, avoiding all subpixel division errors
-                container.scrollLeft = targetSlide.offsetLeft;
-                void container.offsetHeight; // Reflow
-                container.style.scrollBehavior = 'smooth';
-            };
-
-            // Jump immediately
-            setTimeout(jumpToCenter, 100);
 
             // If videos load metadata later and push the layout, re-anchor (only if the user hasn't touched the scroll yet)
             let hasUserInteracted = false;
@@ -148,7 +136,12 @@
             
             container.querySelectorAll('video').forEach(v => {
                 v.addEventListener('loadedmetadata', () => {
-                    if (!hasUserInteracted) jumpToCenter();
+                    if (!hasUserInteracted) {
+                        container.style.scrollBehavior = 'auto';
+                        container.scrollLeft = targetSlide.offsetLeft;
+                        void container.offsetHeight;
+                        container.style.scrollBehavior = 'smooth';
+                    }
                 });
             });
 
