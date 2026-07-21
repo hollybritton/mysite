@@ -142,22 +142,7 @@
                 videoObserver.observe(video);
             });
 
-            // If videos load metadata later and push the layout, re-anchor (only if the user hasn't touched the scroll yet)
-            let hasUserInteracted = false;
-            container.addEventListener('wheel', () => hasUserInteracted = true, { once: true });
-            container.addEventListener('touchstart', () => hasUserInteracted = true, { once: true });
-            container.addEventListener('mousedown', () => hasUserInteracted = true, { once: true });
-            
-            container.querySelectorAll('video').forEach(v => {
-                v.addEventListener('loadedmetadata', () => {
-                    if (!hasUserInteracted) {
-                        container.style.scrollBehavior = 'auto';
-                        container.scrollLeft = targetSlide.offsetLeft;
-                        void container.offsetHeight;
-                        container.style.scrollBehavior = 'smooth';
-                    }
-                });
-            });
+            // Cleanup: No need for loadedmetadata re-anchoring since we use explicit pixel widths now
 
             // Safety-net teleport
             let scrollTimeout;
