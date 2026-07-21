@@ -20,8 +20,9 @@
         </div>
     </div>
 
-    <!-- Fixed Dynamic Scroll Button -->
-    <img src="ampersand.png" alt="Scroll Right" class="ampersand-btn" id="scrollBtn">
+    <!-- Fixed Dynamic Scroll Buttons -->
+    <img src="bracket.png" alt="Scroll Left" class="scroll-bracket left" id="scrollBtnLeft">
+    <img src="bracket_right.png" alt="Scroll Right" class="scroll-bracket right" id="scrollBtnRight">
 
     <!-- Horizontal Scroll Gallery -->
     <main class="horizontal-scroll" id="scrollContainer">
@@ -179,10 +180,16 @@
                 }
             }, { passive: false });
 
-            // Ampersand Scroll Button Logic
-            const scrollBtn = document.getElementById('scrollBtn');
-            scrollBtn.addEventListener('click', () => {
-                // Scroll right by approximately half a viewport width per click
+            // Bracket Scroll Button Logic
+            const scrollBtnLeft = document.getElementById('scrollBtnLeft');
+            const scrollBtnRight = document.getElementById('scrollBtnRight');
+            
+            scrollBtnLeft.addEventListener('click', () => {
+                const scrollAmount = window.innerWidth * 0.6; 
+                container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            });
+
+            scrollBtnRight.addEventListener('click', () => {
                 const scrollAmount = window.innerWidth * 0.6; 
                 container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
             });

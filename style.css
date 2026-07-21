@@ -1,3 +1,11 @@
+@font-face {
+    font-family: 'Rosart';
+    src: url('Rosart-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
     /* 
        We are setting Rosart as the primary font to test. 
@@ -130,19 +138,20 @@ body, html {
     .horizontal-scroll, .slide {
         height: 80vh;
     }
-    .ampersand-btn {
-        right: 1.5rem;
-        width: 40px;
+    .scroll-bracket {
+        top: 60vh;
+        width: 15px;
     }
+    .scroll-bracket.left { left: 1rem; }
+    .scroll-bracket.right { right: 1rem; }
 }
 
-/* Fixed Dynamic Scroll Button */
-.ampersand-btn {
+/* Fixed Dynamic Scroll Buttons */
+.scroll-bracket {
     position: fixed;
-    top: 50%;
-    right: 3rem;
+    top: 57.5vh; /* Center vertically within the 85vh image frame (15vh + 85vh/2) */
     transform: translateY(-50%);
-    width: 60px; /* Adjust size as needed */
+    width: 25px; /* Adjust size as needed */
     height: auto;
     z-index: 50;
     cursor: pointer;
@@ -152,6 +161,14 @@ body, html {
     transition: transform 0.2s ease;
 }
 
-.ampersand-btn:hover {
+.scroll-bracket.left {
+    left: 2rem;
+}
+
+.scroll-bracket.right {
+    right: 2rem;
+}
+
+.scroll-bracket:hover {
     transform: translateY(-50%) scale(1.1);
 }
